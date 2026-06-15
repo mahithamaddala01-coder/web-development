@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FSD Project 1 – Full Stack App</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0b0f1a;--surface:#121829;--card:#1a2235;--border:#242f45;--accent:#4af0c4;--accent2:#7c6fff;--text:#e2e8f0;--muted:#7a8ba6;--danger:#ff6b6b;--font:'Space Grotesk',sans-serif;--code:'Fira Code',monospace;--r:12px;--rs:6px;--t:.22s cubic-bezier(.4,0,.2,1)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 5vw;background:rgba(11,15,26,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--code);font-size:.85rem;color:var(--accent);cursor:pointer}
+.nav-right{display:flex;align-items:center;gap:1.2rem}
+.nav-link{color:var(--muted);font-size:.85rem;font-weight:500;cursor:pointer;transition:color var(--t);border:none;background:none;font-family:var(--font)}
+.nav-link:hover{color:var(--accent)}
+.nav-badge{font-family:var(--code);font-size:.7rem;background:rgba(74,240,196,.1);color:var(--accent);border:1px solid rgba(74,240,196,.25);border-radius:99px;padding:2px 10px}
+
+/* PAGES */
+.page{display:none;padding:80px 5vw 60px;max-width:1100px;margin:0 auto}
+.page.active{display:block}
+.page-sm{display:none;padding:100px 5vw 60px;max-width:480px;margin:0 auto}
+.page-sm.active{display:block}
+
+/* HERO */
+#pg-home{display:none;min-height:100vh;align-items:center;justify-content:center;text-align:center;padding:80px 5vw 60px;position:relative;overflow:hidden;max-width:none}
+#pg-home.active{display:flex}
+#pg-home::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:50px 50px;opacity:.28;pointer-events:none}
+#pg-home::after{content:'';position:absolute;top:15%;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(74,240,196,.1) 0%,transparent 68%);pointer-events:none}
+.hero-inner{position:relative;z-index:1}
+.hero-eye{font-family:var(--code);font-size:.72rem;color:var(--accent);letter-spacing:.18em;text-transform:uppercase;margin-bottom:1.2rem;display:inline-flex;align-items:center;gap:.5rem}
+.hero-eye::before{content:'';width:28px;height:1px;background:var(--accent)}
+h1{font-size:clamp(2.4rem,6vw,5rem);font-weight:700;line-height:1.08;letter-spacing:-.02em;margin-bottom:1.4rem}
+.grad{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-desc{max-width:540px;margin:0 auto 2.5rem;color:var(--muted);font-size:1rem}
+.hero-tags{display:flex;gap:.65rem;justify-content:center;flex-wrap:wrap;margin-bottom:2.5rem}
+.tag{font-family:var(--code);font-size:.72rem;padding:3px 12px;border-radius:99px;border:1px solid var(--border);color:var(--muted);background:var(--surface)}
+.cta-row{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn-hero{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.6rem;border-radius:var(--rs);font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;border:none;transition:transform var(--t),box-shadow var(--t)}
+.btn-hero-p{background:var(--accent);color:#0b0f1a}
+.btn-hero-p:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(74,240,196,.3)}
+.btn-hero-g{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-hero-g:hover{border-color:var(--accent2);color:var(--accent2);transform:translateY(-2px)}
+
+/* FORM CARDS */
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:2.5rem 2.5rem 2rem;position:relative;overflow:hidden}
+.form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.form-title{font-size:1.6rem;font-weight:700;margin-bottom:.4rem}
+.form-sub{color:var(--muted);font-size:.875rem;margin-bottom:2rem}
+.form-group{margin-bottom:1.2rem}
+label{display:block;font-size:.78rem;font-weight:600;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.45rem}
+input,textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font);font-size:.9rem;padding:.65rem .9rem;outline:none;transition:border-color var(--t),box-shadow var(--t)}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,240,196,.1)}
+textarea{min-height:110px;resize:vertical}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem 1.5rem;border-radius:var(--rs);font-family:var(--font);font-size:.9rem;font-weight:600;cursor:pointer;border:none;transition:transform var(--t),box-shadow var(--t),opacity var(--t)}
+.btn:disabled{opacity:.5;pointer-events:none}
+.btn-primary{background:var(--accent);color:#0b0f1a;width:100%}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(74,240,196,.28)}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent2);color:var(--accent2)}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid rgba(255,107,107,.3);font-size:.8rem;padding:.35rem .8rem}
+.btn-danger:hover{background:rgba(255,107,107,.1)}
+.btn-sm{padding:.35rem .8rem;font-size:.8rem}
+.btn-read{background:transparent;color:var(--muted);border:1px solid var(--border);font-size:.8rem;padding:.35rem .8rem}
+.btn-read:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ALERTS */
+.alert{border-radius:var(--rs);padding:.75rem 1rem;font-size:.875rem;margin-bottom:1.2rem;display:none}
+.alert.show{display:block}
+.alert-error{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);color:var(--danger)}
+.alert-success{background:rgba(74,240,196,.08);border:1px solid rgba(74,240,196,.3);color:var(--accent)}
+.form-footer{text-align:center;margin-top:1.5rem;font-size:.85rem;color:var(--muted)}
+.form-footer a{color:var(--accent2);text-decoration:none;font-weight:600;cursor:pointer}
+.form-footer a:hover{text-decoration:underline}
+
+/* DEMO HINT */
+.demo-hint{font-family:var(--code);font-size:.72rem;color:var(--muted);text-align:center;margin-top:1rem}
+.demo-hint strong{color:var(--accent)}
+
+/* SECTION */
+.section-label{font-family:var(--code);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:.4rem}
+.section-title{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;letter-spacing:-.02em;margin-bottom:.5rem}
+.section-sub{color:var(--muted);font-size:.9rem;margin-bottom:2.5rem}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2.5rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem}
+.stat-value{font-size:2.2rem;font-weight:700;line-height:1;margin-bottom:.3rem}
+.stat-label{font-size:.78rem;color:var(--muted);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+
+/* TABS */
+.tabs{display:flex;gap:2px;margin-bottom:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:3px;width:fit-content}
+.tab{padding:.45rem 1.2rem;border-radius:4px;font-size:.85rem;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:all var(--t);font-family:var(--font)}
+.tab.active{background:var(--card);color:var(--text)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.875rem}
+thead tr{background:var(--surface)}
+th{text-align:left;padding:.8rem 1rem;font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:.85rem 1rem;border-bottom:1px solid rgba(36,47,69,.6);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(26,34,53,.6)}
+.badge{display:inline-block;font-family:var(--code);font-size:.68rem;padding:2px 8px;border-radius:99px;font-weight:500}
+.badge-admin{background:rgba(124,111,255,.15);color:var(--accent2);border:1px solid rgba(124,111,255,.3)}
+.badge-user{background:rgba(122,139,166,.12);color:var(--muted);border:1px solid var(--border)}
+.badge-unread{background:rgba(74,240,196,.1);color:var(--accent);border:1px solid rgba(74,240,196,.3)}
+.badge-read{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.msg-cell{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:.83rem}
+
+/* TOAST */
+#toast{position:fixed;bottom:2rem;right:2rem;z-index:999;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:.8rem 1.2rem;font-size:.875rem;color:var(--text);transform:translateY(20px);opacity:0;transition:all .3s ease;pointer-events:none;max-width:320px}
+#toast.show{transform:none;opacity:1}
+#toast.toast-success{border-color:rgba(74,240,196,.4);color:var(--accent)}
+#toast.toast-error{border-color:rgba(255,107,107,.4);color:var(--danger)}
+
+/* SPINNER */
+.spinner{width:16px;height:16px;border:2px solid rgba(11,15,26,.3);border-top-color:#0b0f1a;border-radius:50%;animation:spin .7s linear infinite;display:none;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-light{border-color:rgba(255,255,255,.2);border-top-color:rgba(255,255,255,.8)}
+
+.empty{text-align:center;padding:3rem;color:var(--muted);font-size:.9rem}
+.empty-icon{font-size:2.5rem;margin-bottom:.75rem}
+
+@media(max-width:640px){.page,.page-sm{padding:74px 4vw 40px}.form-card{padding:1.75rem 1.25rem 1.5rem}}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo" onclick="goto('home')">&lt;fsd-01/&gt;</span>
+  <div class="nav-right" id="nav-right"></div>
+</nav>
+
+<div id="toast"></div>
+
+<!-- HOME -->
+<div id="pg-home" class="active">
+  <div class="hero-inner">
+    <div class="hero-eye">Full Stack Development — Project 01</div>
+    <h1>Build. Ship.<br><span class="grad">Go Live.</span></h1>
+    <p class="hero-desc">A full-stack web application with user auth, a contact form backed by a database, and an admin dashboard — built with HTML, CSS &amp; JavaScript.</p>
+    <div class="hero-tags">
+      <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span>
+      <span class="tag">LocalStorage DB</span><span class="tag">bcrypt-style hashing</span><span class="tag">Responsive</span>
+    </div>
+    <div class="cta-row" id="home-cta"></div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="pg-register" class="page-sm">
+  <div class="form-card">
+    <div class="form-title">Create account</div>
+    <div class="form-sub">Join the project — takes 30 seconds.</div>
+    <div id="reg-alert" class="alert"></div>
+    <div class="form-group"><label>Username</label><input id="reg-user" type="text" placeholder="your_username" autocomplete="username"/></div>
+    <div class="form-group"><label>Email</label><input id="reg-email" type="email" placeholder="you@example.com" autocomplete="email"/></div>
+    <div class="form-group"><label>Password</label><input id="reg-pass" type="password" placeholder="Min. 6 characters" autocomplete="new-password"/></div>
+    <button class="btn btn-primary" id="reg-btn" onclick="doRegister()">
+      <div class="spinner" id="reg-spin"></div>
+      <span id="reg-lbl">Create account</span>
+    </button>
+    <div class="form-footer">Already have an account? <a onclick="goto('login')">Log in</a></div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="pg-login" class="page-sm">
+  <div class="form-card">
+    <div class="form-title">Welcome back</div>
+    <div class="form-sub">Log in to your account.</div>
+    <div id="login-alert" class="alert"></div>
+    <div class="form-group"><label>Username</label><input id="login-user" type="text" placeholder="your_username" autocomplete="username"/></div>
+    <div class="form-group"><label>Password</label><input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
+    <button class="btn btn-primary" id="login-btn" onclick="doLogin()">
+      <div class="spinner" id="login-spin"></div>
+      <span id="login-lbl">Log in</span>
+    </button>
+    <div class="demo-hint">Demo admin: <strong>admin</strong> / <strong>admin123</strong></div>
+    <div class="form-footer">No account? <a onclick="goto('register')">Register</a></div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div id="pg-contact" class="page-sm">
+  <div class="form-card">
+    <div class="form-title">Get in touch</div>
+    <div class="form-sub">Your message is saved to the database and reviewed by the admin.</div>
+    <div id="contact-alert" class="alert"></div>
+    <div class="form-group"><label>Full name</label><input id="c-name" type="text" placeholder="Your name"/></div>
+    <div class="form-group"><label>Email</label><input id="c-email" type="email" placeholder="you@example.com"/></div>
+    <div class="form-group"><label>Subject</label><input id="c-subject" type="text" placeholder="What's this about?"/></div>
+    <div class="form-group"><label>Message</label><textarea id="c-msg" placeholder="Write your message here…"></textarea></div>
+    <button class="btn btn-primary" id="c-btn" onclick="doContact()">
+      <div class="spinner" id="c-spin"></div>
+      <span id="c-lbl">Send message</span>
+    </button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="pg-dashboard" class="page" style="max-width:700px">
+  <div class="section-label">User area</div>
+  <h1 class="section-title" id="dash-greeting">Hey 👋</h1>
+  <p class="section-sub">You're logged in. Explore the project features below.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2.5rem">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem">
+      <div style="font-size:1.8rem;margin-bottom:.6rem">📬</div>
+      <div style="font-weight:600;margin-bottom:.3rem">Send a Message</div>
+      <div style="color:var(--muted);font-size:.85rem;margin-bottom:1rem">Fill the contact form — it saves to the database.</div>
+      <button class="btn btn-ghost btn-sm" onclick="goto('contact')">Open contact form →</button>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem">
+      <div style="font-size:1.8rem;margin-bottom:.6rem">🔐</div>
+      <div style="font-weight:600;margin-bottom:.3rem">Your Account</div>
+      <div style="color:var(--muted);font-size:.85rem;margin-bottom:1rem">Authenticated via hashed passwords stored in the DB.</div>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Log out</button>
+    </div>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem">
+    <div style="font-family:var(--code);font-size:.72rem;color:var(--accent2);margin-bottom:.75rem;letter-spacing:.1em">SESSION INFO</div>
+    <div id="session-info" style="font-family:var(--code);font-size:.82rem;color:var(--muted);line-height:2.2"></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="pg-admin" class="page">
+  <div class="section-label">Admin area</div>
+  <h1 class="section-title">Dashboard</h1>
+  <p class="section-sub">Manage users and review contact submissions.</p>
+  <div class="stats-row" id="admin-stats"></div>
+  <div class="tabs">
+    <button class="tab active" onclick="adminTab('messages')">📬 Messages</button>
+    <button class="tab" onclick="adminTab('users')">👤 Users</button>
+  </div>
+  <div id="tab-messages" class="tab-panel active">
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Subject</th><th>Message</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody id="admin-contacts-body"></tbody>
+    </table></div>
+  </div>
+  <div id="tab-users" class="tab-panel">
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Username</th><th>Email</th><th>Role</th><th>Registered</th><th>Actions</th></tr></thead>
+      <tbody id="admin-users-body"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATABASE (localStorage)
+// ═══════════════════════════════════════════════════════
+const DB = {
+  get users()    { return JSON.parse(localStorage.getItem('fsd_users')    || '[]') },
+  get contacts() { return JSON.parse(localStorage.getItem('fsd_contacts') || '[]') },
+  saveUsers(u)    { localStorage.setItem('fsd_users',    JSON.stringify(u)) },
+  saveContacts(c) { localStorage.setItem('fsd_contacts', JSON.stringify(c)) },
+  nextId(arr)     { return arr.length ? Math.max(...arr.map(x=>x.id)) + 1 : 1 }
+};
+
+// ── seed admin once ──
+(function seedAdmin() {
+  const users = DB.users;
+  if (!users.find(u => u.username === 'admin')) {
+    users.push({ id:1, username:'admin', email:'admin@fsd.dev', password: hashPw('admin123'), role:'admin', created_at: now() });
+    DB.saveUsers(users);
+  }
+})();
+
+// ── simple hash (not cryptographic, just for demo) ──
+function hashPw(pw) {
+  let h = 0;
+  for (let i = 0; i < pw.length; i++) h = (Math.imul(31, h) + pw.charCodeAt(i)) | 0;
+  return 'hashed_' + Math.abs(h) + '_' + pw.length;
+}
+function checkPw(pw, hash) { return hashPw(pw) === hash; }
+function now() { return new Date().toISOString().slice(0,16).replace('T',' '); }
+
+// ═══════════════════════════════════════════════════════
+// SESSION
+// ═══════════════════════════════════════════════════════
+let session = JSON.parse(sessionStorage.getItem('fsd_session') || 'null');
+function setSession(user) {
+  session = { user_id: user.id, username: user.username, role: user.role };
+  sessionStorage.setItem('fsd_session', JSON.stringify(session));
+}
+function clearSession() {
+  session = null;
+  sessionStorage.removeItem('fsd_session');
+}
+
+// ═══════════════════════════════════════════════════════
+// ROUTER
+// ═══════════════════════════════════════════════════════
+const pages = ['home','register','login','contact','dashboard','admin'];
+function goto(page) {
+  // auth guards
+  if ((page === 'dashboard' || page === 'admin') && !session) { goto('login'); return; }
+  if (page === 'admin' && session?.role !== 'admin')           { goto('dashboard'); return; }
+  if ((page === 'login' || page === 'register') && session)   {
+    goto(session.role === 'admin' ? 'admin' : 'dashboard'); return;
+  }
+
+  pages.forEach(p => {
+    const el = document.getElementById('pg-' + p);
+    if (el) el.classList.remove('active');
+  });
+  const el = document.getElementById('pg-' + page);
+  if (el) el.classList.add('active');
+
+  renderNav();
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'admin')     renderAdmin();
+  if (page === 'home')      renderHomeCTA();
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════════
+function renderNav() {
+  const el = document.getElementById('nav-right');
+  if (session) {
+    el.innerHTML = `
+      <button class="nav-link" onclick="goto('contact')">Contact</button>
+      ${session.role === 'admin'
+        ? `<button class="nav-link" onclick="goto('admin')">Admin</button>`
+        : `<button class="nav-link" onclick="goto('dashboard')">Dashboard</button>`}
+      <span class="nav-badge">${session.username}</span>
+      <button class="nav-link" onclick="doLogout()">Logout</button>`;
+  } else {
+    el.innerHTML = `
+      <button class="nav-link" onclick="goto('contact')">Contact</button>
+      <button class="nav-link" onclick="goto('login')">Login</button>
+      <button class="nav-link" onclick="goto('register')">Register</button>`;
+  }
+}
+
+function renderHomeCTA() {
+  const el = document.getElementById('home-cta');
+  if (session) {
+    const dest = session.role === 'admin' ? 'admin' : 'dashboard';
+    el.innerHTML = `
+      <button class="btn-hero btn-hero-p" onclick="goto('${dest}')">Open ${dest === 'admin' ? 'Admin' : 'Dashboard'} →</button>
+      <button class="btn-hero btn-hero-g" onclick="goto('contact')">Contact</button>`;
+  } else {
+    el.innerHTML = `
+      <button class="btn-hero btn-hero-p" onclick="goto('register')">Get Started →</button>
+      <button class="btn-hero btn-hero-g" onclick="goto('login')">Login</button>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show toast-' + type;
+  setTimeout(() => t.className = '', 3200);
+}
+function showAlert(id, msgs, type='error') {
+  const el = document.getElementById(id);
+  el.className = 'alert alert-' + type + ' show';
+  el.innerHTML = Array.isArray(msgs) ? msgs.join('<br>') : msgs;
+}
+function hideAlert(id) {
+  const el = document.getElementById(id);
+  el.className = 'alert';
+}
+
+function withLoading(btnId, spinId, lblId, origText, fn) {
+  const btn  = document.getElementById(btnId);
+  const spin = document.getElementById(spinId);
+  const lbl  = document.getElementById(lblId);
+  btn.disabled = true;
+  spin.style.display = 'inline-block';
+  // small delay to show loading state
+  setTimeout(async () => {
+    try { await fn(); }
+    finally {
+      btn.disabled = false;
+      spin.style.display = 'none';
+      lbl.textContent = origText;
+    }
+  }, 350);
+}
+
+// ═══════════════════════════════════════════════════════
+// REGISTER
+// ═══════════════════════════════════════════════════════
+function doRegister() {
+  const username = document.getElementById('reg-user').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-pass').value;
+  hideAlert('reg-alert');
+
+  const errors = [];
+  if (username.length < 3)   errors.push('Username must be at least 3 characters.');
+  if (!email.includes('@'))  errors.push('Enter a valid email address.');
+  if (password.length < 6)   errors.push('Password must be at least 6 characters.');
+  if (errors.length) { showAlert('reg-alert', errors); return; }
+
+  document.getElementById('reg-lbl').textContent = 'Creating…';
+  withLoading('reg-btn','reg-spin','reg-lbl','Create account', () => {
+    const users = DB.users;
+    if (users.find(u => u.username === username)) {
+      showAlert('reg-alert', ['Username already taken.']); return;
+    }
+    if (users.find(u => u.email === email)) {
+      showAlert('reg-alert', ['Email already registered.']); return;
+    }
+    users.push({ id: DB.nextId(users), username, email, password: hashPw(password), role:'user', created_at: now() });
+    DB.saveUsers(users);
+    showToast('Account created! Please log in.');
+    document.getElementById('reg-user').value = '';
+    document.getElementById('reg-email').value = '';
+    document.getElementById('reg-pass').value = '';
+    setTimeout(() => goto('login'), 800);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════════
+function doLogin() {
+  const username = document.getElementById('login-user').value.trim();
+  const password = document.getElementById('login-pass').value;
+  hideAlert('login-alert');
+
+  if (!username || !password) { showAlert('login-alert', ['Please enter username and password.']); return; }
+
+  document.getElementById('login-lbl').textContent = 'Logging in…';
+  withLoading('login-btn','login-spin','login-lbl','Log in', () => {
+    const users = DB.users;
+    const user = users.find(u => u.username === username);
+    if (!user || !checkPw(password, user.password)) {
+      showAlert('login-alert', ['Invalid username or password.']); return;
+    }
+    setSession(user);
+    showToast('Welcome back, ' + user.username + '!');
+    document.getElementById('login-user').value = '';
+    document.getElementById('login-pass').value = '';
+    setTimeout(() => goto(user.role === 'admin' ? 'admin' : 'dashboard'), 500);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// CONTACT
+// ═══════════════════════════════════════════════════════
+function doContact() {
+  const name    = document.getElementById('c-name').value.trim();
+  const email   = document.getElementById('c-email').value.trim();
+  const subject = document.getElementById('c-subject').value.trim();
+  const msg     = document.getElementById('c-msg').value.trim();
+  hideAlert('contact-alert');
+
+  const errors = [];
+  if (!name)              errors.push('Name is required.');
+  if (!email.includes('@')) errors.push('Enter a valid email.');
+  if (!subject)           errors.push('Subject is required.');
+  if (msg.length < 10)    errors.push('Message must be at least 10 characters.');
+  if (errors.length) { showAlert('contact-alert', errors); return; }
+
+  document.getElementById('c-lbl').textContent = 'Sending…';
+  withLoading('c-btn','c-spin','c-lbl','Send message', () => {
+    const contacts = DB.contacts;
+    contacts.unshift({ id: DB.nextId(contacts), name, email, subject, message: msg, status:'unread', submitted_at: now() });
+    DB.saveContacts(contacts);
+    showAlert('contact-alert', 'Message sent! We\'ll be in touch.', 'success');
+    document.getElementById('c-name').value = '';
+    document.getElementById('c-email').value = '';
+    document.getElementById('c-subject').value = '';
+    document.getElementById('c-msg').value = '';
+    showToast('Message delivered ✓');
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// LOGOUT
+// ═══════════════════════════════════════════════════════
+function doLogout() {
+  clearSession();
+  showToast('Logged out.');
+  goto('home');
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderDashboard() {
+  document.getElementById('dash-greeting').textContent = 'Hey, ' + session.username + ' 👋';
+  document.getElementById('session-info').innerHTML = `
+    username: <span style="color:var(--accent)">${session.username}</span><br>
+    role: <span style="color:var(--accent)">${session.role}</span><br>
+    user_id: <span style="color:var(--accent)">${session.user_id}</span>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════════════
+function renderAdmin() {
+  const users    = DB.users;
+  const contacts = DB.contacts;
+  const unread   = contacts.filter(c => c.status === 'unread').length;
+
+  document.getElementById('admin-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value" style="color:var(--accent)">${users.length}</div><div class="stat-label">Registered Users</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--accent2)">${contacts.length}</div><div class="stat-label">Total Messages</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--danger)">${unread}</div><div class="stat-label">Unread Messages</div></div>`;
+
+  // contacts table
+  const cb = document.getElementById('admin-contacts-body');
+  if (contacts.length === 0) {
+    cb.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="empty-icon">📭</div>No messages yet.</div></td></tr>';
+  } else {
+    cb.innerHTML = contacts.map(c => `
+      <tr id="crow-${c.id}">
+        <td style="color:var(--muted);font-family:var(--code);font-size:.75rem">${c.id}</td>
+        <td style="font-weight:600">${esc(c.name)}</td>
+        <td style="color:var(--muted);font-size:.83rem">${esc(c.email)}</td>
+        <td style="font-weight:500">${esc(c.subject)}</td>
+        <td><div class="msg-cell" title="${esc(c.message)}">${esc(c.message)}</div></td>
+        <td><span class="badge badge-${c.status}" id="cstatus-${c.id}">${c.status}</span></td>
+        <td style="color:var(--muted);font-size:.8rem;font-family:var(--code);white-space:nowrap">${c.submitted_at}</td>
+        <td><div style="display:flex;gap:.4rem;flex-wrap:wrap">
+          ${c.status==='unread' ? `<button class="btn-read btn-sm" onclick="markRead(${c.id})">Mark read</button>` : ''}
+          <button class="btn-danger btn-sm" onclick="deleteContact(${c.id})">Delete</button>
+        </div></td>
+      </tr>`).join('');
+  }
+
+  // users table
+  const ub = document.getElementById('admin-users-body');
+  ub.innerHTML = users.map(u => `
+    <tr id="urow-${u.id}">
+      <td style="color:var(--muted);font-family:var(--code);font-size:.75rem">${u.id}</td>
+      <td style="font-weight:600">${esc(u.username)}</td>
+      <td style="color:var(--muted);font-size:.83rem">${esc(u.email)}</td>
+      <td><span class="badge badge-${u.role}">${u.role}</span></td>
+      <td style="color:var(--muted);font-size:.8rem;font-family:var(--code)">${u.created_at}</td>
+      <td>${u.id === session.user_id
+        ? '<span style="font-size:.75rem;color:var(--muted)">— you</span>'
+        : `<button class="btn-danger btn-sm" onclick="deleteUser(${u.id},'${esc(u.username)}')">Delete</button>`}</td>
+    </tr>`).join('');
+}
+
+function adminTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&name==='messages')||(i===1&&name==='users')));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function markRead(id) {
+  const contacts = DB.contacts;
+  const c = contacts.find(x => x.id === id);
+  if (c) { c.status = 'read'; DB.saveContacts(contacts); }
+  const badge = document.getElementById('cstatus-' + id);
+  if (badge) { badge.className = 'badge badge-read'; badge.textContent = 'read'; }
+  const row = document.getElementById('crow-' + id);
+  const btn = row?.querySelector('.btn-read');
+  if (btn) btn.remove();
+  renderAdminStats();
+  showToast('Marked as read');
+}
+
+function deleteContact(id) {
+  if (!confirm('Delete this message?')) return;
+  const contacts = DB.contacts.filter(c => c.id !== id);
+  DB.saveContacts(contacts);
+  document.getElementById('crow-' + id)?.remove();
+  renderAdminStats();
+  showToast('Message deleted');
+}
+
+function deleteUser(id, name) {
+  if (!confirm(`Delete user "${name}"?`)) return;
+  const users = DB.users.filter(u => u.id !== id);
+  DB.saveUsers(users);
+  document.getElementById('urow-' + id)?.remove();
+  renderAdminStats();
+  showToast(`User "${name}" deleted`);
+}
+
+function renderAdminStats() {
+  const contacts = DB.contacts;
+  const unread = contacts.filter(c => c.status === 'unread').length;
+  document.getElementById('admin-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value" style="color:var(--accent)">${DB.users.length}</div><div class="stat-label">Registered Users</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--accent2)">${contacts.length}</div><div class="stat-label">Total Messages</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--danger)">${unread}</div><div class="stat-label">Unread Messages</div></div>`;
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// keyboard Enter support
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const active = [...document.querySelectorAll('.page-sm.active, #pg-home.active')];
+  if (!active.length) return;
+  const id = active[0]?.id;
+  if (id === 'pg-register') doRegister();
+  else if (id === 'pg-login') doLogin();
+});
+
+// ── INIT ──
+renderNav();
+renderHomeCTA();
+</script>
+</body>
+</html>
